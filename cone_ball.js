@@ -51,7 +51,7 @@ svg.append("circle")
     .attr("cx", width/2)
     .attr("cy", height/2)
     .attr("r", rad)
-    .call(transition, rad, height/2)
+    .call(transition)
 
 svg.append("rect")
     .attr("x", 8/9*width)
@@ -60,9 +60,9 @@ svg.append("rect")
     .attr("height", Math.PI*rad*rad/(width/10))
     .attr("fill", "blue")
     .datum(0)
-    .call(cup_transition, rad, height/2);
+    .call(cup_transition);
 
-function transition(element, cy) {
+function transition(element) {
     element.transition()
         .attr("r", rad)
         .attr("cy", function(){
@@ -76,38 +76,41 @@ function transition(element, cy) {
 
             }
         })
-        .each("end", function() { d3.select(this).call(transition, cy);});
+        .each("end", function() { d3.select(this).call(transition);});
 }
 
-function cup_transition(element, height) {
+function cup_transition(element) {
+	r = d3.select("circle").attr("r")
+	cy_c = d3.select("circle").attr("cy")
+	h = d3.select("circle").attr("cy") - tri_top_y
     element.transition()
         .attr("height", function(){
-            if(d3.select("circle").attr("cy") - d3.select("circle").attr("r") > tri_top_y){
-                return Math.PI*d3.select("circle").attr("r")*d3.select("circle").attr("r")/(width/10)
+            if(cy_c - r > tri_top_y){
+                return Math.PI*r*r/(width/10)
             }
-            else if(rad <= tri_veb_x - tri_top_x){
-                ang = 2*Math.PI - Math.asin((5/8*width - 3/8*width)*(1/2)*(1/d3.select("circle").attr("r")))*2
-                return 1/2*d3.select("circle").attr("r")*d3.select("circle").attr("r")*(ang - Math.sin(ang))/(width/10);
+            else if(r <= tri_veb_x - tri_top_x){
+                ang = 2*Math.acos(h/r);
+                return (Math.PI*r*r - 1/2*r*r*(ang - Math.sin(ang)))/(width/10);
             }
             else{
-                ang = Math.asin((5/8*width - 3/8*width)*(1/2)*(1/d3.select("circle").attr("r")))*2
-                return 1/2*d3.select("circle").attr("r")*d3.select("circle").attr("r")*(ang - Math.sin(ang))/(width/10);
+                ang = Math.asin((5/8*width - 3/8*width)*(1/2)*(1/r))*2
+                return Math.abs(1/2*r*r*(ang - Math.sin(ang))/(width/10));
 
             }
         })
         .attr("y", function(){
-            if(d3.select("circle").attr("cy") - d3.select("circle").attr("r") > tri_top_y){
-                return tri_veb_y - Math.PI*d3.select("circle").attr("r")*d3.select("circle").attr("r")/(width/10)
+            if(cy_c - r > tri_top_y){
+                return tri_veb_y - Math.PI*r*r/(width/10)
             }
-            else if(rad <= tri_veb_x - tri_top_x){
-                ang = 2*Math.PI - Math.asin((5/8*width - 3/8*width)*(1/2)*(1/d3.select("circle").attr("r")))*2
-                return tri_veb_y - 1/2*d3.select("circle").attr("r")*d3.select("circle").attr("r")*(ang - Math.sin(ang))/(width/10);
+            else if(r <= tri_veb_x - tri_top_x){
+                ang = 2*Math.acos(h/r);
+                return tri_veb_y - (Math.PI*r*r - 1/2*r*r*(ang - Math.sin(ang)))/(width/10);
             }
             else{
-                ang = Math.asin((5/8*width - 3/8*width)*(1/2)*(1/d3.select("circle").attr("r")))*2
-                return tri_veb_y - 1/2*d3.select("circle").attr("r")*d3.select("circle").attr("r")*(ang - Math.sin(ang))/(width/10);
+                ang = Math.asin((5/8*width - 3/8*width)*(1/2)*(1/r))*2
+                return Math.abs(tri_veb_y - 1/2*r*r*(ang - Math.sin(ang))/(width/10));
 
             }
         })
-        .each("end", function() { d3.select(this).call(cup_transition, height);});
+        .each("end", function() { d3.select(this).call(cup_transition);});
 }
