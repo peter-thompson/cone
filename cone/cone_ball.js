@@ -11,12 +11,10 @@ var angle_sin = (tri_veb_x - tri_top_x)/hyp
 var theta = Math.asin(angle_sin)
 
 d3.select("body").append("input")
-	.attr("class", "slider-width100")
     .attr("type", "range")
     .attr("min", rad)
     .attr("max", 170)
     .attr("value", rad)
-    .attr("style", "width: 300px")
     .on("change", function() { rad = this.value;});
 
 //Triangle points
